@@ -17,28 +17,41 @@ Download MariaDB 10.4 packages from https://dlm.mariadb.com/browse/mariadb_serve
 #### MariaDB 10.6 and Galera 4
 All the D?_C?_N hosts need to have the following packages on them
 
+On D?_C?_N hosts and INTERM_HOST:
+```
+cd 10_6_packages
+ls -l
 galera-4-26.4.21-1.el9.x86_64.rpm
 MariaDB-backup-10.6.21-1.el9.x86_64.rpm
 MariaDB-client-10.6.21-1.el9.x86_64.rpm
 MariaDB-server-10.6.21-1.el9.x86_64.rpm
 MariaDB-shared-10.6.21-1.el9.x86_64.rpm
 MariaDB-common-10.6.21-1.el9.x86_64.rpm
+```
 
 #### MariaDB 10.4 and Galera 4
-The INTERM_HOST needs to have the following packages on it
+The INTERM_HOST needs to have the following additional packages on it
 
+On INTERM_HOST:
+```
+cd 10_4_packages
+ls -l 
 galera-4-26.4.18-1.el8.x86_64.rpm
 MariaDB-backup-10.4.34-1.el8.x86_64.rpm
 MariaDB-client-10.4.34-1.el8.x86_64.rpm
 MariaDB-server-10.4.34-1.el8.x86_64.rpm
 MariaDB-shared-10.4.34-1.el8.x86_64.rpm
 MariaDB-common-10.4.34-1.el8.x86_64.rpm
+```
 
 ## Step 1 : Create Intermediate (MariaDB 10.4) Replica (single node galera)
 ### Step 1-1 : Create Intermediate (MariaDB 10.4) Replica through CC2
 #### Install MariaDB and Galera packages (manual)
 Install the database packages manually on the respective hosts:
+
+On INTERM_HOST:
 ```
+cd 10_4_packages
 dnf localinstall *.rpm
 ```
 
@@ -127,7 +140,7 @@ sudo su - mysql
 mariabackup --prepare --target-dir=/tmp/prod-backup/
 exit
 ```
-##### Copy back the backup to datair of MariaDB
+##### Move back the backup to datair of MariaDB
 ```
 sudo su - mysql
 cd /var/lib
@@ -147,6 +160,7 @@ You will need the following:
 * CC2's hostname
 * CC2's ipv4 address
 * Password used by CC2 to monitor the single node cluster. This can be obtained from the CC2 host's /etc/cmon.d/cmon_CID.cnf file (search for "mysql_password" attribute)
+![img_1.png](img_1.png)
 
 On INTERM_HOST:
 ```
@@ -209,48 +223,11 @@ STOP SLAVE;
 SHOW SLAVE STATUS;
 ```
 
-#### Update repo file (or get the Maria 10.6.21 rpms to the intermediate host)
-```
-cat /etc/yum.repos.d/mariadb.repo
-
-[mariadb-main]
-name = MariaDB Server
-baseurl = https://dlm.mariadb.com/repo/mariadb-server/10.4/yum/rhel/8/x86_64
-gpgkey = file:///etc/pki/rpm-gpg/MariaDB-Server-GPG-KEY
-gpgcheck = 1
-enabled = 1
-module_hotfixes = 1
-
-[mariadb-tools]
-name = MariaDB Tools
-baseurl = https://downloads.mariadb.com/Tools/rhel/8/x86_64
-gpgkey = file:///etc/pki/rpm-gpg/MariaDB-Enterprise-GPG-KEY
-gpgcheck = 1
-```
-
-At the time of this writing the latest 10.6 version is 10.6.21
-Modify version
-```
-cp /etc/yum.repos.d/mariadb.repo /tmp
-sudo sed -i 's/10.4/10.6/' /etc/yum.repos.d/mariadb.repo
-cat /etc/yum.repos.d/mariadb.repo
-[mariadb-main]
-name = MariaDB Server
-baseurl = https://dlm.mariadb.com/repo/mariadb-server/10.6/yum/rhel/8/x86_64
-gpgkey = file:///etc/pki/rpm-gpg/MariaDB-Server-GPG-KEY
-gpgcheck = 1
-enabled = 1
-module_hotfixes = 1
-
-[mariadb-tools]
-name = MariaDB Tools
-baseurl = https://downloads.mariadb.com/Tools/rhel/8/x86_64
-gpgkey = file:///etc/pki/rpm-gpg/MariaDB-Enterprise-GPG-KEY
-gpgcheck = 1
-enabled = 1
-```
-
 #### Stop the MariaDB 10.4 node (INTERM_HOST) from ClusterControl
+On INTERM_HOST:
+```shell
+sudo systemctl status mariadb
+```
 
 #### Backup data, config and logs
 On INTERM_HOST:
@@ -292,9 +269,18 @@ sudo yum remove -y MariaDB-server MariaDB-backup MariaDB-common MariaDB-shared M
 #### Install MariaDB 10.6 packages
 On INTERM_HOST:
 
+Move to the directory where the following rpms are.
 ```
-sudo dnf -y install MariaDB-server galera-4 MariaDB-client MariaDB-shared MariaDB-backup MariaDB-common
-sudo dnf list installed MariaDB-* galera-*
+cd 10_6_packages
+ls -l
+galera-4-26.4.21-1.el9.x86_64.rpm
+MariaDB-backup-10.6.21-1.el9.x86_64.rpm
+MariaDB-client-10.6.21-1.el9.x86_64.rpm
+MariaDB-server-10.6.21-1.el9.x86_64.rpm
+MariaDB-shared-10.6.21-1.el9.x86_64.rpm
+MariaDB-common-10.6.21-1.el9.x86_64.rpm
+
+sudo dnf localinstall *.rpm
 ```
 
 ##### Make Configuration File Changes
@@ -365,6 +351,8 @@ sudo systemctl status mariadb
 On CC2_HOST:
 
 Find the cluster ID (CID) of the cluster in ClusterControl. Update the config as shown below.
+![img_1.png](img_1.png)
+
 ```
 ssh {CC2_HOST}
 sudo vi /etc/cmon.d/cmon_CID.cnf
@@ -413,7 +401,23 @@ NOTE: Please record the binlog file, position and GTID. It will be a line such a
 
 ## Step 2 : Deploy new (single node) D1_C1 and D1_C2 Maria 10.6 galera clusters from CC2 that would be Slaves of Intermediate
 ### Step 2-1 : Deploy new (single node) D1_C1 and D1_C2 Maria 10.6 galera clusters from CC2
-Deploy on hosts D1_C1_1 and D1_C2_1
+Deploy on hosts D1_C1_1 **and** D1_C2_1:
+```
+cd 10_6_packages
+ls -l
+galera-4-26.4.21-1.el9.x86_64.rpm
+MariaDB-backup-10.6.21-1.el9.x86_64.rpm
+MariaDB-client-10.6.21-1.el9.x86_64.rpm
+MariaDB-server-10.6.21-1.el9.x86_64.rpm
+MariaDB-shared-10.6.21-1.el9.x86_64.rpm
+MariaDB-common-10.6.21-1.el9.x86_64.rpm
+
+sudo dnf localinstall *.rpm
+```
+
+#### Deploying through ClusterControl (CC2)
+![img.png](img.png)
+
 ### Step 2-2 (A) : Restore Intermediate's backup on D1_C1_1 (manual)
 #### Transfer Intermediate's backup to D1_C1_1
 On D1_C1_1:
@@ -460,10 +464,9 @@ drwx------. 2 cloud-user cloud-user       144 Mar 13 23:04 world
 -rw-r-----. 1 cloud-user cloud-user        46 Mar 13 23:04 xtrabackup_galera_info
 -rw-r-----. 1 cloud-user cloud-user       584 Mar 13 23:04 xtrabackup_info
 -rw-r-----. 1 cloud-user cloud-user        71 Mar 13 23:04 xtrabackup_slave_info
+
 cat xtrabackup_binlog_info 
 # binlog.000024	395	80000-80000-26,87000-87000-509
-cat xtrabackup_slave_info 
-# CHANGE MASTER TO MASTER_LOG_FILE='binlog.000013', MASTER_LOG_POS=4817;
 ```
 
 ##### Prepare the backup
@@ -474,7 +477,7 @@ mariabackup --prepare --target-dir=/tmp/prod-backup/
 exit
 ```
 
-##### Copy back the backup to datair of MariaDB
+##### Move back the backup to datair of MariaDB
 ```
 sudo su - mysql
 mkdir /tmp/backup-before-restore-datadir
@@ -482,7 +485,7 @@ cd /var/lib
 tar cvfz /tmp/backup-before-restore-datadir/mysql-datadir.tgz ./mysql
 /bin/rm -rf ./mysql/*
 ls -l ./mysql
-mariabackup --copy-back --target-dir=/tmp/prod-backup/
+mariabackup --move-back --target-dir=/tmp/prod-backup/
 exit
 ```
 
@@ -494,6 +497,7 @@ You will need the following:
 * CC2's hostname
 * CC2's ipv4 address
 * Password used by CC2 to monitor the D1_C1 node/cluster. This can be obtained from the CC2 host's /etc/cmon.d/cmon_CID.cnf file (search for "mysql_password" attribute)
+  ![img_1.png](img_1.png)
 
 ```
 # make necessary changes below the controller_ip_address, the controller_hostname, and the password. Here controller is CC2
@@ -509,9 +513,9 @@ You will need the following:
 ```
 
 ### Step 2-2 (B) : Restore Intermediate's backup on D1_C2_1 (manual)
-Repeat Step (2-2) for D1_C2_1
+Repeat Step (2-2) for host D1_C2_1
 
-### Step 2-3 : Sync on D1_C1_1 and D1_C2_2 (manual) from Intermediate
+### Step 2-3 : Sync on D1_C1_1 and D1_C2_1 (manual) from Intermediate
 
 #### Create and Grant privileges for the replication user on the Intermediate node
 You will need the following:
