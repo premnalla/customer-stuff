@@ -8,11 +8,43 @@ https://docs.google.com/presentation/d/1GaqwR1rFb1jJN_7d7wJ30WPc0MV33um8F2naIWYw
 
 ### NOTE: Replace anything in curly brackets with relevant values
 
-## Step 0 : Deploy CC2 (beyond the scope of this document)
+## Step 0 : Deploy software
+### Step 0-1 : Deploy CC2 (beyond the scope of this document)
+### Step 0-2 : Deploy MariaDB galera software
+Download MariaDB 10.6 packages from https://dlm.mariadb.com/browse/mariadb_server/10.6.21/yum/rhel/9Server/x86_64/rpms/
+Download MariaDB 10.4 packages from https://dlm.mariadb.com/browse/mariadb_server/10.4.34/yum/rhel/8Server/x86_64/rpms/
+
+#### MariaDB 10.6 and Galera 4
+All the D?_C?_N hosts need to have the following packages on them
+
+galera-4-26.4.21-1.el9.x86_64.rpm
+MariaDB-backup-10.6.21-1.el9.x86_64.rpm
+MariaDB-client-10.6.21-1.el9.x86_64.rpm
+MariaDB-server-10.6.21-1.el9.x86_64.rpm
+MariaDB-shared-10.6.21-1.el9.x86_64.rpm
+MariaDB-common-10.6.21-1.el9.x86_64.rpm
+
+#### MariaDB 10.4 and Galera 4
+The INTERM_HOST needs to have the following packages on it
+
+galera-4-26.4.18-1.el8.x86_64.rpm
+MariaDB-backup-10.4.34-1.el8.x86_64.rpm
+MariaDB-client-10.4.34-1.el8.x86_64.rpm
+MariaDB-server-10.4.34-1.el8.x86_64.rpm
+MariaDB-shared-10.4.34-1.el8.x86_64.rpm
+MariaDB-common-10.4.34-1.el8.x86_64.rpm
 
 ## Step 1 : Create Intermediate (MariaDB 10.4) Replica (single node galera)
 ### Step 1-1 : Create Intermediate (MariaDB 10.4) Replica through CC2
-Use ClusterControl to achieve this.
+#### Install MariaDB and Galera packages (manual)
+Install the database packages manually on the respective hosts:
+```
+dnf localinstall *.rpm
+```
+
+#### Deploying through ClusterControl (CC2)
+![img.png](img.png)
+
 
 ### Step 1-2 : Create Binary backup of Prod
 Select one of the nodes in the Prod galera cluster and SSH to it.
