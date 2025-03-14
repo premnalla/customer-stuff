@@ -12,6 +12,7 @@ https://docs.google.com/presentation/d/1GaqwR1rFb1jJN_7d7wJ30WPc0MV33um8F2naIWYw
 ### Step 0-1 : Deploy CC2 (beyond the scope of this document)
 ### Step 0-2 : Deploy MariaDB galera software
 Download MariaDB 10.6 packages from https://dlm.mariadb.com/browse/mariadb_server/10.6.21/yum/rhel/9Server/x86_64/rpms/
+
 Download MariaDB 10.4 packages from https://dlm.mariadb.com/browse/mariadb_server/10.4.34/yum/rhel/8Server/x86_64/rpms/
 
 #### MariaDB 10.6 and Galera 4
@@ -160,6 +161,8 @@ You will need the following:
 * CC2's hostname
 * CC2's ipv4 address
 * Password used by CC2 to monitor the single node cluster. This can be obtained from the CC2 host's /etc/cmon.d/cmon_CID.cnf file (search for "mysql_password" attribute)
+ 
+
 ![img_1.png](img_1.png)
 
 On INTERM_HOST:
@@ -351,6 +354,7 @@ sudo systemctl status mariadb
 On CC2_HOST:
 
 Find the cluster ID (CID) of the cluster in ClusterControl. Update the config as shown below.
+
 ![img_1.png](img_1.png)
 
 ```
@@ -497,6 +501,8 @@ You will need the following:
 * CC2's hostname
 * CC2's ipv4 address
 * Password used by CC2 to monitor the D1_C1 node/cluster. This can be obtained from the CC2 host's /etc/cmon.d/cmon_CID.cnf file (search for "mysql_password" attribute)
+
+
   ![img_1.png](img_1.png)
 
 ```
