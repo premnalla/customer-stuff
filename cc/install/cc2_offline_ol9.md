@@ -170,11 +170,11 @@ CTRL-C
 sudo systemctl start cmon-ssh cmon-events cmon-cloud httpd
 ```
 
-#### Skip the following step
+#### ccrpcuser (NOTE: not needed in CC2)
 ```
-export S9S_USER_CONFIG=$HOME/.s9s/ccrpc.conf
-s9s user --create --new-password=$$RPC_TOKEN --generate-key --private-key-file==$HOME/.s9s/ccrpc.key --group=admins --controller=https://localhost:9501 ccrpc
-s9s user --set --first-name=RPC --last-name=API --cmon-user=ccrpc &>/dev/null
+#export S9S_USER_CONFIG=$HOME/.s9s/ccrpc.conf
+#s9s user --create --new-password=$$RPC_TOKEN --generate-key --private-key-file==$HOME/.s9s/ccrpc.key --group=admins --controller=https://localhost:9501 ccrpc
+#s9s user --set --first-name=RPC --last-name=API --cmon-user=ccrpc &>/dev/null
 ```
 
 #### ccsetup
@@ -209,5 +209,5 @@ dba
 #    --controller="https://localhost:9501" {UI_USER}
 ```
 
-#### Point the browser to the host and register
+##### Point the browser to the host and register
 https://{CONTROLLER_HOST_IP_ADDR}

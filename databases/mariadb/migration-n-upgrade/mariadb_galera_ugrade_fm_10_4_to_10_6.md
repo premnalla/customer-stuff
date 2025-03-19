@@ -422,7 +422,7 @@ sudo dnf localinstall *.rpm
 #### Deploying through ClusterControl (CC2)
 ![img.png](img.png)
 
-### Step 2-2 (A) : Restore Intermediate's backup on D1_C1_1 (manual)
+### Step 2-2a (I) : Restore Intermediate's backup on D1_C1_1 (manual)
 #### Transfer Intermediate's backup to D1_C1_1
 On D1_C1_1:
 ```
@@ -505,6 +505,7 @@ You will need the following:
 
   ![img_1.png](img_1.png)
 
+**NOTE**: If the cluster is showing up in ORANGE in CC2, it is most likely due to the fact that CC2 cannot access the DB to manage it. Therefore, you may have to grant it some privileges as shown below.
 ```
 # make necessary changes below the controller_ip_address, the controller_hostname, and the password. Here controller is CC2
 #sudo su - mysql
@@ -518,8 +519,23 @@ You will need the following:
 #exit
 ```
 
-### Step 2-2 (B) : Restore Intermediate's backup on D1_C2_1 (manual)
-Repeat Step (2-2) for host D1_C2_1
+### Step 2-2a (II) : Restore Intermediate's backup on D1_C2_1 (manual)
+Repeat Step (2-2a) (I) for host D1_C2_1
+
+### Step 2-2b (I) : (OPTIONAL) Reclaim space on D1_C1_1 (from CC2)
+On D1_C1_1:
+
+* Backup data using `mysqldump` from CC2
+![cc2-backup-1.png](../../../cc/install/images/cc2-backup-1.png)
+Optionally you can choose partial backup. But, we do **NOT** recommend selecting `partial backup` (i.e., don't select partial backup)
+![cc2-backup-2.png](../../../cc/install/images/cc2-backup-2.png)
+* Restore the backup from CC2...
+![cc-restore-1.png](../../../cc/install/images/cc-restore-1.png)
+And...
+![cc2-restore-2.png](../../../cc/install/images/cc2-restore-2.png)
+
+### Step 2-2b (II) : (OPTIONAL) Reclaim space on D1_C2_1
+Repeat Step 2-2b (I) for D1_C2_1
 
 ### Step 2-3 : Sync on D1_C1_1 and D1_C2_1 (manual) from Intermediate
 
@@ -550,7 +566,7 @@ You will need the following info:
 * GTID from the /tmp/prod-backup/xtrabackup_binlog_info file (on Intermediate host) or from the terminal where you ran mariabackup on the PROD_BACKUPHOST
   (binlog.000024	395	80000-80000-26,87000-87000-509)
 
-On D1_C1_1 and D1_C2_1:
+On D1_C1_1 **and** D1_C2_1:
 ```
 CHANGE MASTER TO 
    MASTER_HOST="INTERM_HOST", 
