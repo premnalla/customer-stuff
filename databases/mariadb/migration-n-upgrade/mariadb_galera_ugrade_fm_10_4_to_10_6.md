@@ -527,10 +527,13 @@ On D1_C1_1:
 
 * Backup data using `mysqldump` from CC2
 ![cc2-backup-1.png](../../../cc/install/images/cc2-backup-1.png)
-Optionally you can choose partial backup. But, we do **NOT** recommend selecting `partial backup` (i.e., don't select partial backup)
+
+* Optionally you can choose partial backup. But, we do **NOT** recommend selecting `partial backup` (i.e., don't select partial backup)
 ![cc2-backup-2.png](../../../cc/install/images/cc2-backup-2.png)
+
 * Restore the backup from CC2...
 ![cc-restore-1.png](../../../cc/install/images/cc-restore-1.png)
+
 And...
 ![cc2-restore-2.png](../../../cc/install/images/cc2-restore-2.png)
 
