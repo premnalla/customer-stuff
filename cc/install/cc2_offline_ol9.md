@@ -38,6 +38,9 @@ sudo dnf config-manager --set-enabled ol9_codeready_builder
 sudo yum -y install wget dmidecode hostname python3 mariadb mariadb-server httpd mod_ssl
 ```
 
+**NOTE** Please watch the changelog for latest binary names and update the `wget` to pull-down the latest from the changelog
+
+[ClusterControl changelog](https://support.severalnines.com/hc/en-us/articles/212425943-ChangeLog)
 ```
 mkdir packages
 cd packages
