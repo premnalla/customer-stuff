@@ -41,6 +41,8 @@ sudo yum -y install wget dmidecode hostname python3 mariadb mariadb-server httpd
 **NOTE** Please watch the changelog for latest binary names and update the `wget` to pull-down the latest from the changelog
 
 [ClusterControl changelog](https://support.severalnines.com/hc/en-us/articles/212425943-ChangeLog)
+
+[Link to package list](https://severalnines.com/downloads/cmon/)
 ```
 mkdir packages
 cd packages
