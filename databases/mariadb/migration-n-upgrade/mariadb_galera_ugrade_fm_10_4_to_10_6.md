@@ -57,7 +57,7 @@ dnf localinstall *.rpm
 ```
 
 #### Deploying through ClusterControl (CC2)
-![img.png](img.png)
+![img.png](images/img.png)
 
 
 ### Step 1-2 : Create Binary backup of Prod
@@ -163,7 +163,7 @@ You will need the following:
 * Password used by CC2 to monitor the single node cluster. This can be obtained from the CC2 host's /etc/cmon.d/cmon_CID.cnf file (search for "mysql_password" attribute)
  
 
-![img_1.png](img_1.png)
+![img_1.png](images/img_1.png)
 
 On INTERM_HOST:
 ```
@@ -355,7 +355,7 @@ On CC2_HOST:
 
 Find the cluster ID (CID) of the cluster in ClusterControl. Update the config as shown below.
 
-![img_1.png](img_1.png)
+![img_1.png](images/img_1.png)
 
 ```
 ssh {CC2_HOST}
@@ -420,7 +420,7 @@ sudo dnf localinstall *.rpm
 ```
 
 #### Deploying through ClusterControl (CC2)
-![img.png](img.png)
+![img.png](images/img.png)
 
 ### Step 2-2a (I) : Restore Intermediate's backup on D1_C1_1 (manual)
 #### Transfer Intermediate's backup to D1_C1_1
@@ -503,7 +503,7 @@ You will need the following:
 * Password used by CC2 to monitor the D1_C1 node/cluster. This can be obtained from the CC2 host's /etc/cmon.d/cmon_CID.cnf file (search for "mysql_password" attribute)
 
 
-  ![img_1.png](img_1.png)
+  ![img_1.png](images/img_1.png)
 
 **NOTE**: If the cluster is showing up in ORANGE in CC2, it is most likely due to the fact that CC2 cannot access the DB to manage it. Therefore, you may have to grant it some privileges as shown below.
 ```
@@ -526,16 +526,16 @@ Repeat Step (2-2a) (I) for host D1_C2_1
 On D1_C1_1:
 
 * Backup data using `mysqldump` from CC2
-![cc2-backup-1.png](../../../cc/install/images/cc2-backup-1.png)
+![cc2-backup-1.png](images/cc2-backup-1.png)
 
 * Optionally you can choose partial backup. But, we do **NOT** recommend selecting `partial backup` (i.e., don't select partial backup)
-![cc2-backup-2.png](../../../cc/install/images/cc2-backup-2.png)
+![cc2-backup-2.png](images/cc2-backup-2.png)
 
 * Restore the backup from CC2...
-![cc-restore-1.png](../../../cc/install/images/cc-restore-1.png)
+![cc-restore-1.png](images/cc-restore-1.png)
 
 And...
-![cc2-restore-2.png](../../../cc/install/images/cc2-restore-2.png)
+![cc2-restore-2.png](images/cc2-restore-2.png)
 
 ### Step 2-2b (II) : (OPTIONAL) Reclaim space on D1_C2_1
 Repeat Step 2-2b (I) for D1_C2_1
