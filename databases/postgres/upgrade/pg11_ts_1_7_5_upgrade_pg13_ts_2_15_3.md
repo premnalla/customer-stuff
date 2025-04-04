@@ -10,30 +10,14 @@ Ubuntu 20.04 LTS (Jan 28, 2025) release
 
 # Phase (I) - Upgrade PG(11)-Timescale(1_7_x) to PG(13)-Timescale(2.15.3)
 
-## Step 0 : Prepare configuration files from a PG(13)-Timescale(2_15_3) cluster
-### Step 0 - 1a : Setup a single-node PG(13)-Timescale(2_15_3) cluster through ClusterControl (CC)
+## Step 0 : Prepare configuration files from a PG(13) cluster
+### Step 0 - 1a : Setup a single-node PG(13) cluster through ClusterControl (CC)
 Host/Node: Temporary/TMP
 ```
 sudo su - postgres
 psql
 psql (13.20 (Ubuntu 13.20-1.pgdg20.04+1))
 Type "help" for help.
-
-postgres=# \dx
-List of installed extensions
-Name        | Version |   Schema   |                                      Description                                      
---------------------+---------+------------+---------------------------------------------------------------------------------------
-pg_stat_statements | 1.8     | public     | track planning and execution statistics of all SQL statements executed
-plpgsql            | 1.0     | pg_catalog | PL/pgSQL procedural language
-timescaledb        | 2.15.3  | public     | Enables scalable inserts and complex queries for time-series data (Community Edition)
-(3 rows)
-
-postgres=# select * from pg_available_extensions where name like '%timescale%';
-        name         | default_version | installed_version |                                        comment                                        
----------------------+-----------------+-------------------+---------------------------------------------------------------------------------------
- timescaledb_toolkit | 1.19.0          |                   | Library of analytical hyperfunctions, time-series pipelining, and other SQL utilities
- timescaledb         | 2.15.3          | 2.15.3            | Enables scalable inserts and complex queries for time-series data (Community Edition)
-(2 rows)
 
 postgres=# select version();
                                                                version                                                               
@@ -42,7 +26,7 @@ postgres=# select version();
 (1 row)
 ```
 
-### Step 0 - 1b : Copy PG(13)-Timescale(2_15_3) configuration files to a common host (or, nfs location)
+### Step 0 - 1b : Copy PG(13) configuration files to a common host (or, nfs location)
 ### Step 0 - 2a : Remove the cluster from ClusterControl
 ### Step 0 - 2b : Decommission the host (return it to the available pool)
 ### Step 0 - 3 : Create replication user on replica (R1)
@@ -118,7 +102,17 @@ sudo systemctl status postgresql@11-main
 ```
 
 #### Step 1 - 1b : Install PG13 - (R2)
+
 Host/Node: R2
+
+```
+# Move the PG13 configuration files from "Step - 0" to a local directory on host R2
+sudo su - postgres
+mkdir -p ~/pg13_configs
+mv SRCLOC/* ~/pg13_configs
+exit
+```
+
 ```
 sudo apt update
 sudo apt list postgresql-13
@@ -181,12 +175,13 @@ sudo systemctl status postgresql@13-main
 
 sudo su - postgres
 psql -p 6432
-postgres=# select version();
+select version();
                                                                version                                                               
 -------------------------------------------------------------------------------------------------------------------------------------
  PostgreSQL 13.20 (Ubuntu 13.20-1.pgdg20.04+1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0, 64-bit
 
-postgres=# \q
+\q
+
 #
 exit
 sudo systemctl stop postgresql@13-main
@@ -208,17 +203,19 @@ sudo systemctl status postgresql@11-main
 
 sudo su - postgres
 psql
-postgres=# select version();
+select version();
 -  PostgreSQL 11.22 (Ubuntu 11.22-9.pgdg20.04+1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0, 64-bit
-postgres=# select * from pg_available_extensions where name like '%timescale%';
+
+select * from pg_available_extensions where name like '%timescale%';
 - timescaledb | 1.7.5           |                   | Enables scalable inserts and complex queries for time-series data
-postgres=# create database test_db;
-postgres=# \c test_db
+
+create database test_db;
+\c test_db
 CREATE EXTENSION timescaledb WITH VERSION '1.7.5' CASCADE;
-test_db=# \dx
+\dx
 - plpgsql     | 1.0     | pg_catalog | PL/pgSQL procedural language
 - timescaledb | 1.7.5   | public     | Enables scalable inserts and complex queries for time-series data
-test_db=# \q
+\q
 exit
 # backup configuration files as OS user (e.g. ubuntu)
 mkdir -p ./postgresql/11/main/
@@ -308,24 +305,24 @@ sudo systemctl status postgresql@11-main
 ```
 sudo su - postgres
 psql
-postgres=# select * from pg_available_extensions where name like '%timescale%';
+select * from pg_available_extensions where name like '%timescale%';
 - timescaledb | 2.3.1           |                   | Enables scalable inserts and complex queries for time-series data
 
-postgres=# \c test_db
-test_db=# \dx
+\c test_db
+\dx
  plpgsql     | 1.0     | pg_catalog | PL/pgSQL procedural language
  timescaledb | 1.7.5   | public     | Enables scalable inserts and complex queries for time-series data
 
-test_db=# select * from pg_available_extensions where name like '%timescale%';
+select * from pg_available_extensions where name like '%timescale%';
     name     | default_version | installed_version |                              comment                              
 -------------+-----------------+-------------------+-------------------------------------------------------------------
  timescaledb | 2.3.1           | 1.7.5             | Enables scalable inserts and complex queries for time-series data
 
-test_db=# \q
+\q
 psql
-postgres=# \c test_db
-test_db=# ALTER EXTENSION timescaledb UPDATE;
-test_db=# \dx
+\c test_db
+ALTER EXTENSION timescaledb UPDATE;
+\dx
                                       List of installed extensions
     Name     | Version |   Schema   |                            Description                            
 -------------+---------+------------+-------------------------------------------------------------------
@@ -333,12 +330,13 @@ test_db=# \dx
  timescaledb | 2.3.1   | public     | Enables scalable inserts and complex queries for time-series data
 (2 rows)
 
-test_db=# select * from pg_available_extensions where name like '%timescale%';
+select * from pg_available_extensions where name like '%timescale%';
     name     | default_version | installed_version |                              comment                              
 -------------+-----------------+-------------------+-------------------------------------------------------------------
  timescaledb | 2.3.1           | 2.3.1             | Enables scalable inserts and complex queries for time-series data
-test_db=# SELECT   time_bucket('1 hour', time) AS bucket,   first(price,time), last(price, time)   FROM stocks_real_time srt   WHERE time > now() - INTERVAL '30 days'   GROUP BY bucket, symbol  LIMIT 10;
-test_db=# \q
+
+SELECT   time_bucket('1 hour', time) AS bucket,   first(price,time), last(price, time)   FROM stocks_real_time srt   WHERE time > now() - INTERVAL '30 days'   GROUP BY bucket, symbol  LIMIT 10;
+\q
 
 #
 exit
@@ -438,20 +436,20 @@ sudo systemctl status postgresql@13-main
 ```
 sudo su - postgres
 psql -p 6432
-postgres=# select version();
+select version();
                                                                version                                                               
 -------------------------------------------------------------------------------------------------------------------------------------
  PostgreSQL 13.20 (Ubuntu 13.20-1.pgdg20.04+1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0, 64-bit
 
-postgres=# select * from pg_available_extensions where name like '%timescale%';
+select * from pg_available_extensions where name like '%timescale%';
         name         | default_version | installed_version |                                        comment                                        
 ---------------------+-----------------+-------------------+---------------------------------------------------------------------------------------
  timescaledb_toolkit | 1.19.0          |                   | Library of analytical hyperfunctions, time-series pipelining, and other SQL utilities
  timescaledb         | 2.15.3          |                   | Enables scalable inserts and complex queries for time-series data (Community Edition)
 
-postgres=# create database foo;
-postgres=# \c foo
-foo=# CREATE EXTENSION timescaledb WITH VERSION '2.3.1' CASCADE;
+create database foo;
+\c foo
+CREATE EXTENSION timescaledb WITH VERSION '2.3.1' CASCADE;
 WARNING:  
 WELCOME TO
  _____ _                               _     ____________  
@@ -472,9 +470,22 @@ For more information and how to disable, please see our docs https://docs.timesc
 
 CREATE EXTENSION
 
-foo=# \c postgres
-postgres=# drop database foo;
-postgres=# \q
+\dx
+                                                List of installed extensions
+    Name     | Version |   Schema   |                                      Description                                      
+-------------+---------+------------+---------------------------------------------------------------------------------------
+ plpgsql     | 1.0     | pg_catalog | PL/pgSQL procedural language
+ timescaledb | 2.3.1   | public     | Enables scalable inserts and complex queries for time-series data (Community Edition)
+
+select * from pg_available_extensions where name like '%timescale%';
+        name         | default_version | installed_version |                                        comment                                        
+---------------------+-----------------+-------------------+---------------------------------------------------------------------------------------
+ timescaledb_toolkit | 1.19.0          |                   | Library of analytical hyperfunctions, time-series pipelining, and other SQL utilities
+ timescaledb         | 2.15.3          | 2.3.1             | Enables scalable inserts and complex queries for time-series data (Community Edition)
+
+\c postgres
+drop database foo;
+\q
 exit
 ```
 
@@ -608,18 +619,18 @@ sudo systemctl status postgres*
 ```
 sudo su - postgres
 psql -p 6432
-postgres=# select version();
+select version();
                                                                version                                                               
 -------------------------------------------------------------------------------------------------------------------------------------
  PostgreSQL 13.20 (Ubuntu 13.20-1.pgdg20.04+1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0, 64-bit
 
-postgres=# select * from pg_available_extensions where name like '%timescale%';
+select * from pg_available_extensions where name like '%timescale%';
         name         | default_version | installed_version |                                        comment                                        
 ---------------------+-----------------+-------------------+---------------------------------------------------------------------------------------
  timescaledb_toolkit | 1.19.0          |                   | Library of analytical hyperfunctions, time-series pipelining, and other SQL utilities
  timescaledb         | 2.15.3          |                   | Enables scalable inserts and complex queries for time-series data (Community Edition)
 
-postgres=# \l
+\l
                                                    List of databases
    Name    |  Owner   | Encoding | Locale Provider | Collate |  Ctype  | ICU Locale | ICU Rules |   Access privileges   
 -----------+----------+----------+-----------------+---------+---------+------------+-----------+-----------------------
@@ -630,8 +641,8 @@ postgres=# \l
            |          |          |                 |         |         |            |           | =c/postgres
  test_db   | postgres | UTF8     | libc            | C.UTF-8 | C.UTF-8 |            |           | 
 
-postgres=# \c test_db
-test_db=# \dx
+\c test_db
+\dx
                                       List of installed extensions
     Name     | Version |   Schema   |                            Description                            
 -------------+---------+------------+-------------------------------------------------------------------
@@ -639,25 +650,25 @@ test_db=# \dx
  timescaledb | 2.3.1   | public     | Enables scalable inserts and complex queries for time-series data
 (2 rows)
 
-test_db=# select * from pg_available_extensions where name like '%timescale%';
+select * from pg_available_extensions where name like '%timescale%';
         name         | default_version | installed_version |                                        comment                                        
 ---------------------+-----------------+-------------------+---------------------------------------------------------------------------------------
  timescaledb_toolkit | 1.19.0          |                   | Library of analytical hyperfunctions, time-series pipelining, and other SQL utilities
  timescaledb         | 2.15.3          | 2.3.1             | Enables scalable inserts and complex queries for time-series data (Community Edition)
 
-test_db=# \d
+\d
               List of relations
  Schema |       Name       | Type  |  Owner   
 --------+------------------+-------+----------
  public | company          | table | postgres
  public | stocks_real_time | table | postgres
 
-test_db=# select count(*) from stocks_real_time ;
+select count(*) from stocks_real_time ;
   count  
 ---------
  3096768
 
-test_db=# SELECT   time_bucket('1 hour', time) AS bucket,   first(price,time), last(price, time)   FROM stocks_real_time srt   WHERE time > now() - INTERVAL '30 days'   GROUP BY bucket  LIMIT 10;
+SELECT   time_bucket('1 hour', time) AS bucket,   first(price,time), last(price, time)   FROM stocks_real_time srt   WHERE time > now() - INTERVAL '30 days'   GROUP BY bucket  LIMIT 10;
          bucket         |  first  |  last  
 ------------------------+---------+--------
  2025-01-21 12:00:00+00 |  145.32 | 435.62
@@ -672,7 +683,7 @@ test_db=# SELECT   time_bucket('1 hour', time) AS bucket,   first(price,time), l
  2025-01-21 21:00:00+00 |  428.53 |  174.9
 (10 rows)
 
-test_db=# \q
+\q
 
 #
 exit
@@ -684,8 +695,11 @@ sudo systemctl stop postgresql@13-main
 
 #### Step 4 - 2e : Stop and disable Postgres 11
 ```
-sudo vi /etc/postgres/11/main/postgresql.conf
+sudo su - postgres
+vi /etc/postgresql/11/main/postgresql.conf
 port = 6432
+
+exit
 
 sudo systemctl stop postgresql@11-main
 sudo systemctl status postgresql@11-main
@@ -694,11 +708,14 @@ sudo systemctl disable postgresql@11-main
 
 #### Step 4 - 2f : Start Postgres 13
 ##### Change port number of Postgres 13
-Edit /etc/postgres/13/main/postgresql.conf and change port to 5432
+Edit /etc/postgresqp/13/main/postgresql.conf and change port to 5432
 
 ```
-sudo vi /etc/postgres/13/main/postgresql.conf
+sudo su - postgres
+vi /etc/postgresql/13/main/postgresql.conf
 port = 5432
+
+exit
 
 sudo systemctl start postgresql@13-main
 sudo systemctl enable postgresql@13-main
@@ -710,48 +727,47 @@ sudo systemctl status postgresql@13-main
 ```
 sudo su - postgres
 psql
-postgres=# select version();
+select version();
                                                                version                                                               
 -------------------------------------------------------------------------------------------------------------------------------------
  PostgreSQL 13.19 (Ubuntu 13.19-1.pgdg20.04+1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0, 64-bit
 
-postgres=# select * from pg_available_extensions where name like '%timescale%';
+select * from pg_available_extensions where name like '%timescale%';
     name     | default_version | installed_version |                                        comment                                        
 -------------+-----------------+-------------------+---------------------------------------------------------------------------------------
  timescaledb | 2.15.3          |                   | Enables scalable inserts and complex queries for time-series data (Community Edition)
 
-postgres=# \l
+\l
                               List of databases
    Name    |  Owner   | Encoding | Collate |  Ctype  |   Access privileges   
 -----------+----------+----------+---------+---------+-----------------------
  test_db   | postgres | UTF8     | C.UTF-8 | C.UTF-8 | 
 
-postgres=# \c test_db
+\c test_db
 
-test_db=# \dx
+\dx
                                       List of installed extensions
     Name     | Version |   Schema   |                            Description                            
 -------------+---------+------------+-------------------------------------------------------------------
  plpgsql     | 1.0     | pg_catalog | PL/pgSQL procedural language
  timescaledb | 2.3.1   | public     | Enables scalable inserts and complex queries for time-series data
 
-test_db=# select * from pg_available_extensions where name like '%timescale%';
+select * from pg_available_extensions where name like '%timescale%';
         name         | default_version | installed_version |                                        comment                                        
 ---------------------+-----------------+-------------------+---------------------------------------------------------------------------------------
  timescaledb_toolkit | 1.19.0          |                   | Library of analytical hyperfunctions, time-series pipelining, and other SQL utilities
  timescaledb         | 2.15.3          | 2.3.1             | Enables scalable inserts and complex queries for time-series data (Community Edition)
 
-test_db=# \q
+\q
 ```
 
 Upgrade Timescale. Replace `test_db` below with your database
 ```
 psql
-postgres=# \c test_db
-test_db=# ALTER EXTENSION timescaledb UPDATE TO '2.15.3';
-ALTER EXTENSION
+\c test_db
+ALTER EXTENSION timescaledb UPDATE TO '2.15.3';
 
-test_db=# \dx
+\dx
                                       List of installed extensions
     Name     | Version |   Schema   |                            Description                            
 -------------+---------+------------+-------------------------------------------------------------------
@@ -759,18 +775,18 @@ test_db=# \dx
  timescaledb | 2.15.3  | public     | Enables scalable inserts and complex queries for time-series data
 (2 rows)
 
-test_db=# select * from pg_available_extensions where name like '%timescale%';
+select * from pg_available_extensions where name like '%timescale%';
         name         | default_version | installed_version |                                        comment                                        
 ---------------------+-----------------+-------------------+---------------------------------------------------------------------------------------
  timescaledb_toolkit | 1.19.0          |                   | Library of analytical hyperfunctions, time-series pipelining, and other SQL utilities
  timescaledb         | 2.15.3          | 2.15.3            | Enables scalable inserts and complex queries for time-series data (Community Edition)
 
-test_db=# select count(*) from stocks_real_time ;
+select count(*) from stocks_real_time ;
   count  
 ---------
  3096768
 
-test_db=# SELECT   time_bucket('1 hour', time) AS bucket,   first(price,time), last(price, time)   FROM stocks_real_time srt   WHERE time > now() - INTERVAL '30 days'   GROUP BY bucket, symbol  LIMIT 10;
+SELECT   time_bucket('1 hour', time) AS bucket,   first(price,time), last(price, time)   FROM stocks_real_time srt   WHERE time > now() - INTERVAL '30 days'   GROUP BY bucket, symbol  LIMIT 10;
          bucket         | first  |  last   
 ------------------------+--------+---------
  2025-01-21 12:00:00+00 | 225.26 |  225.44
@@ -784,7 +800,7 @@ test_db=# SELECT   time_bucket('1 hour', time) AS bucket,   first(price,time), l
  2025-01-21 12:00:00+00 | 138.33 |  138.33
  2025-01-21 12:00:00+00 | 435.28 |  435.62
 
-test_db=# \q
+\q
 exit
 ```
 
