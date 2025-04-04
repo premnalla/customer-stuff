@@ -150,6 +150,8 @@ sudo su - postgres
 mkdir pg13_config_backup
 mkdir -p /etc/postgresql/13/main/conf.d
 pushd /etc/postgresql/13/main
+
+# Let's assume the PG13 config files from "Step 0" are in ~/pg13_configs
 cp ~/pg13_configs/*.conf .
 popd
 mkdir ~/13/main/conf.d
@@ -682,6 +684,9 @@ sudo systemctl stop postgresql@13-main
 
 #### Step 4 - 2e : Stop and disable Postgres 11
 ```
+sudo vi /etc/postgres/11/main/postgresql.conf
+port = 6432
+
 sudo systemctl stop postgresql@11-main
 sudo systemctl status postgresql@11-main
 sudo systemctl disable postgresql@11-main
@@ -692,6 +697,9 @@ sudo systemctl disable postgresql@11-main
 Edit /etc/postgres/13/main/postgresql.conf and change port to 5432
 
 ```
+sudo vi /etc/postgres/13/main/postgresql.conf
+port = 5432
+
 sudo systemctl start postgresql@13-main
 sudo systemctl enable postgresql@13-main
 sudo systemctl status postgresql@13-main
@@ -781,21 +789,3 @@ exit
 ```
 
 # End of Phase (I)
-
-### Transfer PG13 config files to host
-Make sure the following sub-dirs exist in the home dir of the `postgres` user
-```
-sudo su - postgres
-postgres@timescale-upgrade:~$ ls -al pg1?_configs
-pg13_configs:
-total 56
-drwxrwxr-x 2 postgres postgres  4096 Feb 24 19:22 .
-drwxr-xr-x 5 postgres postgres  4096 Feb 24 19:22 ..
--rw-r--r-- 1 postgres postgres   143 Feb 18 22:58 pg_ctl.conf
--rw-r----- 1 postgres postgres  4933 Feb 18 22:58 pg_hba.conf
--rw-r----- 1 postgres postgres  1636 Feb 18 22:58 pg_ident.conf
--rw-r--r-- 1 postgres postgres 28345 Feb 18 22:58 postgresql.conf
--rw-r--r-- 1 postgres postgres   317 Feb 18 22:58 start.conf
-
-exit
-```
