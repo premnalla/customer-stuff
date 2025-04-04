@@ -117,7 +117,81 @@ sudo systemctl restart postgresql@11-main
 sudo systemctl status postgresql@11-main
 ```
 
-#### Step 1 - 1b : Install Timescale(1.7.5) - (R2)
+#### Step 1 - 1b : Install PG13 - (R2)
+Host/Node: R2
+```
+sudo apt update
+sudo apt list postgresql-13
+sudo apt install postgresql-13
+```
+
+```
+sudo su - postgres
+/usr/lib/postgresql/13/bin/pg_ctl -D /var/lib/postgresql/13/main initdb
+...
+creating configuration files ... ok
+running bootstrap script ... ok
+performing post-bootstrap initialization ... ok
+syncing data to disk ... ok
+
+initdb: warning: enabling "trust" authentication for local connections
+You can change this by editing pg_hba.conf or using the option -A, or
+--auth-local and --auth-host, the next time you run initdb.
+
+Success. You can now start the database server using:
+
+    /usr/lib/postgresql/13/bin/pg_ctl -D /var/lib/postgresql/13/main -l logfile start
+
+exit
+```
+
+```
+sudo su - postgres
+mkdir pg13_config_backup
+mkdir -p /etc/postgresql/13/main/conf.d
+pushd /etc/postgresql/13/main
+cp ~/pg13_configs/*.conf .
+popd
+mkdir ~/13/main/conf.d
+pushd ~/13/main/
+mv pg_hba.conf postgresql.conf pg_ident.conf ~/pg13_config_backup
+ln -s /etc/postgresql/13/main/postgresql.conf .
+ln -s /etc/postgresql/13/main/pg_hba.conf .
+ln -s /etc/postgresql/13/main/pg_ident.conf .
+chmod -R go-w /etc/postgresql/13
+vi postgresql.conf
+# change port number (e.g. 6432)
+port = 6432                             # (change requires restart)
+
+#
+exit
+```
+
+```
+pg_lsclusters 
+Ver Cluster Port Status Owner     Data directory              Log file
+11  main    5432 online postgres  /var/lib/postgresql/11/main /var/log/postgresql/postgresql-11-main.log
+13  main    6432 down   <unknown> /var/lib/postgresql/13/main /var/log/postgresql/postgresql-13-main.log
+
+sudo systemctl status postgresql@13-main
+sudo systemctl start postgresql@13-main
+sudo systemctl status postgresql@13-main
+
+sudo su - postgres
+psql -p 6432
+postgres=# select version();
+                                                               version                                                               
+-------------------------------------------------------------------------------------------------------------------------------------
+ PostgreSQL 13.20 (Ubuntu 13.20-1.pgdg20.04+1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0, 64-bit
+
+postgres=# \q
+#
+exit
+sudo systemctl stop postgresql@13-main
+sudo systemctl status postgresql@13-main
+```
+
+#### Step 1 - 1c : Install Timescale(1.7.5) - (R2)
 Host/Node: R2
 ```
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 55EE6BF7698E3D58D72C0DD9ECB3980CC59E610B
@@ -708,88 +782,6 @@ exit
 
 # End of Phase (I)
 
-## Prem
-
-## Install PG 13
-### Install PG13
-```
-sudo apt update
-sudo apt list postgresql-13
-sudo apt install postgresql-13
-```
-
-## Initialize PG13 
-### Initialize PG13
-```
-sudo su - postgres
-/usr/lib/postgresql/13/bin/pg_ctl -D /var/lib/postgresql/13/main initdb
-...
-creating configuration files ... ok
-running bootstrap script ... ok
-performing post-bootstrap initialization ... ok
-syncing data to disk ... ok
-
-initdb: warning: enabling "trust" authentication for local connections
-You can change this by editing pg_hba.conf or using the option -A, or
---auth-local and --auth-host, the next time you run initdb.
-
-Success. You can now start the database server using:
-
-    /usr/lib/postgresql/13/bin/pg_ctl -D /var/lib/postgresql/13/main -l logfile start
-
-exit
-```
-
-## Configure PG13 
-### Configure PG13
-```
-sudo su - postgres
-mkdir pg13_config_backup
-mkdir -p /etc/postgresql/13/main/conf.d
-pushd /etc/postgresql/13/main
-cp ~/pg13_configs/*.conf .
-popd
-mkdir ~/13/main/conf.d
-pushd ~/13/main/
-mv pg_hba.conf postgresql.conf pg_ident.conf ~/pg13_config_backup
-ln -s /etc/postgresql/13/main/postgresql.conf .
-ln -s /etc/postgresql/13/main/pg_hba.conf .
-ln -s /etc/postgresql/13/main/pg_ident.conf .
-chmod -R go-w /etc/postgresql/13
-vi postgresql.conf
-# change port number (e.g. 6432)
-port = 6432                             # (change requires restart)
-
-#
-exit
-```
-
-## Test PG13
-### Test PG13
-```
-pg_lsclusters 
-Ver Cluster Port Status Owner     Data directory              Log file
-11  main    5432 online postgres  /var/lib/postgresql/11/main /var/log/postgresql/postgresql-11-main.log
-13  main    6432 down   <unknown> /var/lib/postgresql/13/main /var/log/postgresql/postgresql-13-main.log
-
-sudo systemctl status postgresql@13-main
-sudo systemctl start postgresql@13-main
-sudo systemctl status postgresql@13-main
-
-sudo su - postgres
-psql -p 6432
-postgres=# select version();
-                                                               version                                                               
--------------------------------------------------------------------------------------------------------------------------------------
- PostgreSQL 13.20 (Ubuntu 13.20-1.pgdg20.04+1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0, 64-bit
-
-postgres=# \q
-#
-exit
-sudo systemctl stop postgresql@13-main
-sudo systemctl status postgresql@13-main
-```
-
 ### Transfer PG13 config files to host
 Make sure the following sub-dirs exist in the home dir of the `postgres` user
 ```
@@ -807,5 +799,3 @@ drwxr-xr-x 5 postgres postgres  4096 Feb 24 19:22 ..
 
 exit
 ```
-
-
