@@ -87,7 +87,7 @@ sudo cmon --init \
           --mysql-hostname="127.0.0.1" \
           --mysql-port="3306" \
           --mysql-username="cmon" \
-          --mysql-password="$DB_ROOT_USER_PASSWORD" \
+          --mysql-password="DB_CMON_USER_PASSWORD" \
           --mysql-database="cmon" \
           --hostname="$CONTROLLER_HOST_IP_ADDR" \
           --rpc-token="$RPC_TOKEN" \
@@ -108,7 +108,7 @@ sudo cmon --init \
           --mysql-hostname="127.0.0.1" \
           --mysql-port="3306" \
           --mysql-username="cmon" \
-          --mysql-password="$DB_ROOT_USER_PASSWORD" \
+          --mysql-password="DB_CMON_USER_PASSWORD" \
           --mysql-database="cmon" \
           --hostname="$CONTROLLER_HOST_IP_ADDR" \
           --rpc-token="$RPC_TOKEN" \
