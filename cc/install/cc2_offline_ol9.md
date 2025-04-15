@@ -6,7 +6,7 @@
 #### Set some environment variables
 NOTE: you need to have actual values for the variables in curly brackets below.
 ```
-export CONTROLLER_HOST_IP_ADDR={HOST_IP_ADDR}
+export CONTROLLER_HOST_IPV4_ADDR={HOST_IPV4_ADDR}
 export CONTROLLER_ID=$(uuidgen)
 export RPC_TOKEN=$(uuidgen | tr -d '-')
 export DB_ROOT_USER_PASSWORD="{DB_ROOT_USER_PASSWORD}"
@@ -72,10 +72,10 @@ mysql -uroot -p$DB_ROOT_USER_PASSWORD -e 'SHOW DATABASES'
 ```
 
 ```
-# NOTE: Please substitute actual values for DB_CMON_USER_PASSWORD, CONTROLLER_HOST_IP_ADDR
+# NOTE: Please substitute actual values for DB_CMON_USER_PASSWORD, CONTROLLER_HOST_IPV4_ADDR
 mysql -uroot -p$DB_ROOT_USER_PASSWORD -e 'GRANT ALL PRIVILEGES ON *.* TO "cmon"@"localhost" IDENTIFIED BY "{DB_CMON_USER_PASSWORD}" WITH GRANT OPTION'
 mysql -uroot -p$DB_ROOT_USER_PASSWORD -e 'GRANT ALL PRIVILEGES ON *.* TO "cmon"@"127.0.0.1" IDENTIFIED BY "{DB_CMON_USER_PASSWORD}" WITH GRANT OPTION'
-mysql -uroot -p$DB_ROOT_USER_PASSWORD -e 'GRANT ALL PRIVILEGES ON *.* TO "cmon"@"{CONTROLLER_HOST_IP_ADDR}" IDENTIFIED BY "{DB_CMON_USER_PASSWORD}" WITH GRANT OPTION'
+mysql -uroot -p$DB_ROOT_USER_PASSWORD -e 'GRANT ALL PRIVILEGES ON *.* TO "cmon"@"{CONTROLLER_HOST_IPV4_ADDR}" IDENTIFIED BY "{DB_CMON_USER_PASSWORD}" WITH GRANT OPTION'
 mysql -uroot -p$DB_ROOT_USER_PASSWORD -e 'FLUSH PRIVILEGES'
 ```
 
@@ -89,7 +89,7 @@ sudo cmon --init \
           --mysql-username="cmon" \
           --mysql-password="DB_CMON_USER_PASSWORD" \
           --mysql-database="cmon" \
-          --hostname="$CONTROLLER_HOST_IP_ADDR" \
+          --hostname="$CONTROLLER_HOST_IPV4_ADDR" \
           --rpc-token="$RPC_TOKEN" \
           --controller-id="$CONTROLLER_ID"
 #
@@ -110,7 +110,7 @@ sudo cmon --init \
           --mysql-username="cmon" \
           --mysql-password="DB_CMON_USER_PASSWORD" \
           --mysql-database="cmon" \
-          --hostname="$CONTROLLER_HOST_IP_ADDR" \
+          --hostname="$CONTROLLER_HOST_IPV4_ADDR" \
           --rpc-token="$RPC_TOKEN" \
           --controller-id="$CONTROLLER_ID"
 #
@@ -150,19 +150,21 @@ sudo cp -f /tmp/ssl/server.key /etc/ssl/private/s9server.key
 
 ##### Setup webserver security config
 ```
-sudo su -
+#sudo su -
 #
-cat > /etc/httpd/conf.d/security.conf << EOF
+cat > /tmp/security.conf << EOF
 Header set X-Frame-Options: "sameorigin"
 EOF
 #
-cp /usr/share/cmon/apache/cc-frontend.conf /etc/httpd/conf.d/cc-webapp.conf
+sudo mv /tmp/security.conf /etc/httpd/conf.d/security.conf
 #
-sed -i "s|https://cc2.severalnines.local:9443.*|https://{controller_ip_address}\/|g" /etc/httpd/conf.d/cc-webapp.conf
-sed -i "s|Listen 9443|#Listen 443|g" /etc/httpd/conf.d/cc-webapp.conf
-sed -i "s|9443|443|g" /etc/httpd/conf.d/cc-webapp.conf
+sudo cp /usr/share/cmon/apache/cc-frontend.conf /etc/httpd/conf.d/cc-webapp.conf
 #
-exit
+sudo sed -i "s|https://cc2.severalnines.local:9443.*|https://$CONTROLLER_HOST_IPV4_ADDR\/|g" /etc/httpd/conf.d/cc-webapp.conf
+sudo sed -i "s|Listen 9443|#Listen 443|g" /etc/httpd/conf.d/cc-webapp.conf
+sudo sed -i "s|9443|443|g" /etc/httpd/conf.d/cc-webapp.conf
+#
+#exit
 ```
 
 ##### Enable daemon auto start on reboots
@@ -215,4 +217,4 @@ dba
 ```
 
 ##### Point the browser to the host and register
-https://{CONTROLLER_HOST_IP_ADDR}
+https://{CONTROLLER_HOST_IPV4_ADDR}
