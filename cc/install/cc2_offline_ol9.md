@@ -12,6 +12,11 @@ export CONTROLLER_ID=$(uuidgen)
 export RPC_TOKEN=$(uuidgen | tr -d '-')
 export DB_ROOT_USER_PASSWORD="{DB_ROOT_USER_PASSWORD}"
 export DB_CMON_USER_PASSWORD="{DB_CMON_USER_PASSWORD}"
+# UI User
+export UI_USER="{UI_USER}"
+export UI_USER_PASSWORD="{UI_USER_PASSWORD}"
+export UI_USER_EMAIL_ADDRESS="{UI_USER_EMAIL_ADDRESS}"
+
 # echo the env variables
 echo $CONTROLLER_HOST_IPV4_ADDR
 echo $CONTROLLER_HOSTNAME
@@ -19,6 +24,9 @@ echo $CONTROLLER_ID
 echo $RPC_TOKEN
 echo $DB_ROOT_USER_PASSWORD
 echo $DB_CMON_USER_PASSWORD
+echo $UI_USER
+echo $UI_USER_PASSWORD
+echo $UI_USER_EMAIL_ADDRESS
 ```
 
 ```
@@ -217,3 +225,11 @@ dba
 
 ##### Point the browser to the host and register
 https://{CONTROLLER_HOST_IPV4_ADDR}
+
+**NOTE**: if the registration pages doesn't show up, go ahead and create the first admin user
+```
+echo $UI_USER
+echo $UI_USER_PASSWORD
+echo $UI_USER_EMAIL_ADDRESS
+s9s user --create --new-password=$UI_USER_PASSWORD --group=admins --email-address="$UI_USER_EMAIL_ADDRESS" --controller="https://localhost:9501" $UI_USER
+```
