@@ -51,12 +51,12 @@ sudo yum -y install wget dmidecode hostname python3 mariadb mariadb-server httpd
 mkdir packages
 cd packages
 wget https://severalnines.com/downloads/cmon/clustercontrol-clud-2.3.2-423-x86_64.rpm
-wget https://severalnines.com/downloads/cmon/clustecontrol-cloud-2.3.2-423-x86_64.rpm
+wget https://severalnines.com/downloads/cmon/clustercontrol-cloud-2.3.2-423-x86_64.rpm
 wget https://severalnines.com/downloads/cmon/clustercontrol-controller-2.3.2-12518-x86_64.rpm
 wget https://severalnines.com/downloads/cmon/clustercontrol2-2.3.2-1949.x86_64.rpm
 wget https://severalnines.com/downloads/cmon/clustercontrol-ssh-2.3.2-213-x86_64.rpm
 wget https://severalnines.com/downloads/cmon/clustercontrol-notifications-2.3.2-373-x86_64.rpm
-wget https://repo.severalnines.com/s9s-tools/CentOS_9/x86_64/s9s-tools-1.9-28.1.x86_64.rpm
+wget https://repo.severalnines.com/s9s-tools/CentOS_9/x86_64/s9s-tools-1.9-31.1.x86_64.rpm
 #wget https://severalnines.com/downloads/cmon/clustercontrol-controller-dbg-2.2.0-10707-x86_64.rpm
 #wget https://severalnines.com/downloads/cmon/clustercontrol-proxy-2.2.5-49-x86_64.rpm
 ```
