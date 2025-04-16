@@ -50,15 +50,15 @@ sudo yum -y install wget dmidecode hostname python3 mariadb mariadb-server httpd
 ```
 mkdir packages
 cd packages
-wget https://severalnines.com/downloads/cmon/clustercontrol-clud-2.3.1-422-x86_64.rpm
-wget https://severalnines.com/downloads/cmon/clustercontrol-cloud-2.3.1-422-x86_64.rpm
-wget https://severalnines.com/downloads/cmon/clustercontrol-controller-2.3.1-12185-x86_64.rpm
-wget https://severalnines.com/downloads/cmon/clustercontrol2-2.3.1-1877.x86_64.rpm
-#wget https://severalnines.com/downloads/cmon/clustercontrol-proxy-2.2.5-49-x86_64.rpm
-wget https://severalnines.com/downloads/cmon/clustercontrol-ssh-2.3.1-212-x86_64.rpm
-wget https://severalnines.com/downloads/cmon/clustercontrol-notifications-2.3.1-372-x86_64.rpm
+wget https://severalnines.com/downloads/cmon/clustercontrol-clud-2.3.2-423-x86_64.rpm
+wget https://severalnines.com/downloads/cmon/clustecontrol-cloud-2.3.2-423-x86_64.rpm
+wget https://severalnines.com/downloads/cmon/clustercontrol-controller-2.3.2-12518-x86_64.rpm
+wget https://severalnines.com/downloads/cmon/clustercontrol2-2.3.2-1949.x86_64.rpm
+wget https://severalnines.com/downloads/cmon/clustercontrol-ssh-2.3.2-213-x86_64.rpm
+wget https://severalnines.com/downloads/cmon/clustercontrol-notifications-2.3.2-373-x86_64.rpm
 wget https://repo.severalnines.com/s9s-tools/CentOS_9/x86_64/s9s-tools-1.9-28.1.x86_64.rpm
 #wget https://severalnines.com/downloads/cmon/clustercontrol-controller-dbg-2.2.0-10707-x86_64.rpm
+#wget https://severalnines.com/downloads/cmon/clustercontrol-proxy-2.2.5-49-x86_64.rpm
 ```
 
 ```
@@ -75,6 +75,7 @@ sudo mysqladmin -uroot password "$DB_ROOT_USER_PASSWORD"
 mysql -uroot -p$DB_ROOT_USER_PASSWORD -e 'SHOW DATABASES'
 ```
 
+**STOP!!!** Collect the DB_CMON_USER_PASSWORD, CONTROLLER_HOST_IPV4_ADDR and CONTROLLER_HOSTNAME
 ```
 # NOTE: Please substitute actual values for DB_CMON_USER_PASSWORD, CONTROLLER_HOST_IPV4_ADDR
 mysql -uroot -p$DB_ROOT_USER_PASSWORD -e 'GRANT ALL PRIVILEGES ON *.* TO "cmon"@"localhost" IDENTIFIED BY "{DB_CMON_USER_PASSWORD}" WITH GRANT OPTION'
@@ -166,7 +167,7 @@ sudo mv /tmp/security.conf /etc/httpd/conf.d/security.conf
 sudo cp /usr/share/cmon/apache/cc-frontend.conf /etc/httpd/conf.d/cc-webapp.conf
 #
 sudo sed -i "s|cc2.severalnines.local|$CONTROLLER_HOSTNAME|g" /etc/httpd/conf.d/cc-webapp.conf
-sudo sed -i "s|*.severalnines.local|$CONTROLLER_HOSTNAME.local|g" /etc/httpd/conf.d/cc-webapp.conf
+sudo sed -i "s|severalnines.local|$CONTROLLER_HOSTNAME.local|g" /etc/httpd/conf.d/cc-webapp.conf
 sudo sed -i "s|Listen 9443|#Listen 443|g" /etc/httpd/conf.d/cc-webapp.conf
 sudo sed -i "s|9443|443|g" /etc/httpd/conf.d/cc-webapp.conf
 #
