@@ -38,9 +38,9 @@ sudo systemctl status firewalld
 ```
 
 ```
-# RHEL9
+# RHEL9 - EPEL repo...
 # sudo subscription-manager repos --enable codeready-builder-for-rhel-9-$(arch)-rpms
-sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+# sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 ```
 
 ```
