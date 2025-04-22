@@ -29,7 +29,7 @@ exit
 sudo vi /etc/sudoers
 ## Allow root to run any commands anywhere
 root    ALL=(ALL)       ALL
-$OS_USER ALL=(ALL) NOPASSWD: ALL
+ccuser ALL=(ALL) NOPASSWD: ALL
 ```
 
 ```
@@ -37,4 +37,4 @@ sudo su - $OS_USER
 sudo ls /usr
 exit
 ```
-**make sure above don't prompt for password**
+**make sure above doesn't prompt for password**
