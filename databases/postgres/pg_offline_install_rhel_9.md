@@ -89,7 +89,9 @@ sudo dnf install -y *.rpm
 ```
 # STOP!!! - Make the appropriate substitution for PG_VERSION and PG_INSTANCE_ID
 export PG_VERSION=16
-export PG_INSTANCE_ID=6432
+
+# NOTE: this is any unique identifying string such as "app1" instead of "6432". "6432" has been used here for convenience
+export PG_INSTANCE_ID=app1 
 ```
 
 ```
@@ -97,16 +99,15 @@ sudo su -
 cd /etc/systemd/system
 # STOP!!! - Make the appropriate substitution for PG_VERSION and PG_INSTANCE_ID
 export PG_VERSION=16
-export PG_INSTANCE_ID=6432
+export PG_INSTANCE_ID=app1
 export PG_SERVICE_UNIT="postgresql-$PG_VERSION-$PG_INSTANCE_ID.service"
 echo $PG_SERVICE_UNIT
 cp /lib/systemd/system/postgresql-$PG_VERSION.service ./$PG_SERVICE_UNIT 
 mkdir -p $PG_SERVICE_UNIT.d
 vi $PG_SERVICE_UNIT.d/override.conf
 [Service]
-# Make sure the subdirectory "16/6432" is accurate for PG version and instance-id. 
-# For e.g. if you used an PG_INSTANCE_ID of "app1" then you should replace "6432" with "app1"
-Environment=PGDATA=/var/lib/pgsql/16/6432
+# Make sure the subdirectory "16/app1" is accurate for PG version and instance-id. 
+Environment=PGDATA=/var/lib/pgsql/16/app1
 SendSIGKILL=no
 :wq
 
@@ -128,12 +129,12 @@ Initializing database ... OK
 sudo su - postgres
 # STOP!!! - Make the appropriate substitution for PG_VERSION and PG_INSTANCE_ID
 export PG_VERSION=16
-export PG_INSTANCE_ID=6432
+export PG_INSTANCE_ID=app1
 vi $PG_VERSION/$PG_INSTANCE_ID/postgresql.conf
 # Make sure the directory prefix is accurate!!!
-data_directory = '/var/lib/pgsql/16/6432'               # use data in another directory
-hba_file = '/var/lib/pgsql/16/6432/pg_hba.conf' # host-based authentication file
-ident_file = '/var/lib/pgsql/16/6432/pg_ident.conf'     # ident configuration file
+data_directory = '/var/lib/pgsql/16/app1'               # use data in another directory
+hba_file = '/var/lib/pgsql/16/app1/pg_hba.conf' # host-based authentication file
+ident_file = '/var/lib/pgsql/16/app1/pg_ident.conf'     # ident configuration file
 
 listen_addresses = '*'          # what IP address(es) to listen on;
 
@@ -141,7 +142,7 @@ listen_addresses = '*'          # what IP address(es) to listen on;
 port = 6432                             # (change requires restart)
 
 # Make sure the cluster_name matches the PG_VERSION and PG_INSTANCE_ID
-cluster_name = '16/6432'                       # added to process titles if nonempty
+cluster_name = '16/app1'                       # added to process titles if nonempty
 
 :wq
 
@@ -188,7 +189,7 @@ s9s user --list # make sure you can see the users
 
 ```
 export PG_VERSION=16
-export PG_INSTANCE_ID=6432
+export PG_INSTANCE_ID=app1
 export NODES="10.0.0.52:6432"
 export DB_ADMIN=postgres
 export DB_ADMIN_PW="aBc.123"
