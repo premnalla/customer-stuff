@@ -39,6 +39,7 @@ As of May 2, 2025
 Example:
 1. _**PG_VERSION**_ - (PostgreSQL version: "16")
 2. _**PG_INSTANCE_ID**_ - (PostgreSQL instance identifier: "6432" (**NOTE: this can by any string. E.g. it can be "app1" instead of "6432"))
+3. _**PG_INSTANCE_DATA_DIR**_ - The postgres instance's data directory
 
 
 ## Setup the target database host(s)
@@ -86,12 +87,17 @@ sudo dnf install -y *.rpm
 ### Post-installation
 #### Create service unit
 **Let's assume the Postgres server will be listening on port _6432_**
+
+**STOP!!!** - Make the appropriate substitution for _PG_VERSION_ and _PG_INSTANCE_ID_ and _PG_INSTANCE_DATA_DIR_
+
 ```
-# STOP!!! - Make the appropriate substitution for PG_VERSION and PG_INSTANCE_ID
 export PG_VERSION=16
 
 # NOTE: this is any unique identifying string such as "app1" instead of "6432". "6432" has been used here for convenience
 export PG_INSTANCE_ID=app1 
+
+# The following is the default data dir for RHEL 8 and 8
+export PG_INSTANCE_DATA_DIR=/var/lib/pgsql/$PG_VERSION/$PG_INSTANCE_ID
 ```
 
 ```
@@ -106,7 +112,7 @@ cp /lib/systemd/system/postgresql-$PG_VERSION.service ./$PG_SERVICE_UNIT
 mkdir -p $PG_SERVICE_UNIT.d
 vi $PG_SERVICE_UNIT.d/override.conf
 [Service]
-# Make sure the subdirectory "16/app1" is accurate for PG version and instance-id. 
+# Make sure the directory is accurate. Make changes if necessary 
 Environment=PGDATA=/var/lib/pgsql/16/app1
 SendSIGKILL=no
 :wq
@@ -131,7 +137,7 @@ sudo su - postgres
 export PG_VERSION=16
 export PG_INSTANCE_ID=app1
 vi $PG_VERSION/$PG_INSTANCE_ID/postgresql.conf
-# Make sure the directory prefix is accurate!!!
+# Make sure the directory prefix is accurate. Make changes if necessary 
 data_directory = '/var/lib/pgsql/16/app1'               # use data in another directory
 hba_file = '/var/lib/pgsql/16/app1/pg_hba.conf' # host-based authentication file
 ident_file = '/var/lib/pgsql/16/app1/pg_ident.conf'     # ident configuration file
@@ -187,6 +193,7 @@ s9s user --create \
 s9s user --list # make sure you can see the users
 ```
 
+**STOP!!!** - Make sure you changed the following env variables to reflect your setup.
 ```
 export PG_VERSION=16
 export PG_INSTANCE_ID=app1
