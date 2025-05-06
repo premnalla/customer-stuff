@@ -2,6 +2,8 @@
 
 #### References
 [Installing from RPMs](https://medium.com/@guemandeuhassler96/manually-install-postgresql-server-on-linux-a8358d85ec51)
+[ClusterControl CLI reference guide](https://docs.severalnines.com/clustercontrol/latest/reference-manuals/components/clustercontrol-cli/)
+[Offline Database Deployment using ClusterControl (Prometheus exporters)](https://docs.severalnines.com/clustercontrol/latest/getting-started/tutorials/day-1-operations/deploy-database-cluster-offline-environment/#offline-database-deployment-using-clustercontrol)
 
 #### Downloads
 
@@ -198,6 +200,7 @@ s9s user --list # make sure you can see the users
 export PG_VERSION=16
 export PG_INSTANCE_ID=app1
 export NODES="10.0.0.52:6432"
+# export NODES="10.0.0.52?master;10.0.0.53?slave;"
 export DB_ADMIN=postgres
 export DB_ADMIN_PW="aBc.123"
 export OS_USER=cloud-user
