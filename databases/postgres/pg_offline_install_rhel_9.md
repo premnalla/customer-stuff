@@ -1,9 +1,11 @@
 # Offline installation and setup of PG using RPMs on RHEL9
 
 #### References
-[Installing from RPMs](https://medium.com/@guemandeuhassler96/manually-install-postgresql-server-on-linux-a8358d85ec51)
-[ClusterControl CLI reference guide](https://docs.severalnines.com/clustercontrol/latest/reference-manuals/components/clustercontrol-cli/)
-[Offline Database Deployment using ClusterControl (Prometheus exporters)](https://docs.severalnines.com/clustercontrol/latest/getting-started/tutorials/day-1-operations/deploy-database-cluster-offline-environment/#offline-database-deployment-using-clustercontrol)
+1. [Installing from RPMs](https://medium.com/@guemandeuhassler96/manually-install-postgresql-server-on-linux-a8358d85ec51)
+
+2. [ClusterControl CLI reference guide](https://docs.severalnines.com/clustercontrol/latest/reference-manuals/components/clustercontrol-cli/)
+
+3. [Offline Database Deployment using ClusterControl (Prometheus exporters)](https://docs.severalnines.com/clustercontrol/latest/getting-started/tutorials/day-1-operations/deploy-database-cluster-offline-environment/#offline-database-deployment-using-clustercontrol)
 
 #### Downloads
 
@@ -204,6 +206,7 @@ export NODES="10.0.0.52:6432"
 export DB_ADMIN=postgres
 export DB_ADMIN_PW="aBc.123"
 export OS_USER=cloud-user
+#export OS_USER_PW="XXXXX"  
 export SSH_PRIV_KEY=/home/ubuntu/.ssh/id_rsa
 export CC_CLUSTER_NAME="mypg-$PG_VERSION-$PG_INSTANCE_ID"
 export DATA_DIR="/var/lib/pgsql/$PG_VERSION/$PG_INSTANCE_ID"
@@ -223,6 +226,7 @@ s9s cluster --register \
     --use-internal-repos \
     --with-ssl \
     --wait
+#    --os-password=$OS_USER_PW \
 ```
 
 ### Download and move the prometheus exporter packages to ClusterControl
