@@ -7,6 +7,13 @@
 
 3. [Offline Database Deployment using ClusterControl (Prometheus exporters)](https://docs.severalnines.com/clustercontrol/latest/getting-started/tutorials/day-1-operations/deploy-database-cluster-offline-environment/#offline-database-deployment-using-clustercontrol)
 
+4. Initializing database options
+   
+    4.1 [postgresql-VERSION-setup](https://dba.stackexchange.com/questions/292431/postgresql-setup-initdb-with-custom-data-directory)
+
+    4.2 [initdb tool (with and w/o pg_ctl)](https://www.postgresql.org/docs/current/creating-cluster.html)
+   
+
 #### Downloads
 
 [Download site for PG - postgresq.org](https://yum.postgresql.org/rpmchart/)
