@@ -57,7 +57,7 @@ dnf localinstall *.rpm
 ```
 
 #### Deploying through ClusterControl (CC2)
-![img.png](images/img.png?raw=true){width=400px}
+![img.png](./images/img.png)
 
 
 ### Step 1-2 : Create Binary backup of Prod
