@@ -231,3 +231,30 @@ echo $UI_USER_PASSWORD
 echo $UI_USER_EMAIL_ADDRESS
 s9s user --create --new-password=$UI_USER_PASSWORD --group=admins --email-address="$UI_USER_EMAIL_ADDRESS" --controller="https://localhost:9501" $UI_USER
 ```
+
+### Download and move the prometheus exporter packages to ClusterControl
+[Reference documentation](https://docs.severalnines.com/clustercontrol/latest/getting-started/tutorials/day-1-operations/deploy-database-cluster-offline-environment/#offline-database-deployment-using-clustercontrol)
+
+Go to the section **"Setting up Prometheus exporters"**
+
+```
+# As of May 5, 2025
+cd /var/cache/cmon/packages
+wget https://github.com/prometheus/prometheus/releases/download/v2.29.2/prometheus-2.29.2.linux-amd64.tar.gz
+wget https://github.com/prometheus/haproxy_exporter/releases/download/v0.9.0/haproxy_exporter-0.9.0.linux-amd64.tar.gz
+wget https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz
+wget https://github.com/prometheus/mysqld_exporter/releases/download/v0.15.0/mysqld_exporter-0.15.0.linux-amd64.tar.gz
+wget https://github.com/prometheus-community/postgres_exporter/releases/download/v0.13.2/postgres_exporter-0.13.2.linux-amd64.tar.gz
+wget https://github.com/prometheus-community/pgbouncer_exporter/releases/download/v0.4.0/pgbouncer_exporter-0.4.0.linux-amd64.tar.gz
+wget https://github.com/percona/proxysql_exporter/releases/download/v1.1.2/proxysql_exporter_linux_amd64.tar.gz
+wget https://github.com/kedazo/process_exporter/releases/download/0.10.10/process_exporter-0.10.10.linux-amd64.tar.gz
+wget https://github.com/kedazo/mongodb_exporter/releases/download/v0.11.0/mongodb_exporter-v0.11.0.linux-amd64.tar.gz
+wget https://github.com/oliver006/redis_exporter/releases/download/v1.52.0/redis_exporter-v1.52.0.linux-amd64.tar.gz
+wget https://github.com/severalnines/mssql_exporter/releases/download/0.6.0b/mssql_exporter-0.6.0-beta.0.linux-amd64.tar.gz
+#mkdir -p /tmp/s9s/prometheus
+#wget https://downloads.mariadb.com/files/MaxScale/2.5.7/packages/rhel/8/maxscale-2.5.7-1.rhel.8.x86_64.rpm
+#wget http://www.haproxy.org/download/1.8/src/haproxy-1.8.9.tar.gz
+#wget http://www.keepalived.org/software/keepalived-1.2.24.tar.gz
+#wget http://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+#wget http://libslack.org/daemon/download/daemon-0.6.4-1.x86_64.rpm
+```
