@@ -3,11 +3,11 @@
 #
 # Credentials
 #
-export MYSQLROOTPW="9ISyTrBOQneNP01rugO24y3mbiEUFXZr"           # IMPORTANT: replace
+export MYSQLROOTPW='9ISyTrBOQneNP01rugO24y3mbiEUFXZr'           # IMPORTANT: replace
 export MIGRATION_REPL_USER=repl_user
-export MIGRATION_REPL_USER_PW="5DoT.tMQp}lW8EX9Ec}HnF,YGjuyJyO" # IMPORTANT: replace
+export MIGRATION_REPL_USER_PW='5DoT.tMQp}lW8EX9Ec}HnF,YGjuyJyO' # IMPORTANT: replace
 export BACKUPUSER="backupuser"                                  # from secrets-backup.cnf
-export BACKUPUSER_PW="dFTrC512wHk3MCG7J@089t{bm,F,Njyu"         # from secrets-backup.cnf
+export BACKUPUSER_PW='dFTrC512wHk3MCG7J@089t{bm,F,Njyu'         # from secrets-backup.cnf
 export CMON_USER=cmon
 
 #
