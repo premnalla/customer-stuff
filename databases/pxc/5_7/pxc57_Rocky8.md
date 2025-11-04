@@ -31,11 +31,13 @@ mysql --version
 ```
 
 ### On host #1, do the following
-#### Setup my.cnf and secrets-backup.cnf
+#### Setup my.cnf and secrets-backup.cnf and env.sh
 NOTE: the [secrets-backup.cnf](./secrets-backup.cnf) and [my.cnf](./my.cnf) TEMPLATES are available in this github directory.
 Copy the contents of the files to the target host by editing the respective files as shown below.
 
-**IMPORTANT**: You must change the values of passwords and users as appropriate !!!
+**IMPORTANT**: 
+1. Create `/tmp/env.sh` file. You must change the values of passwords and users as appropriate in this file !!!
+2. **Merge** values of **my.cnf** with what you may currently have, especially the `innodb` parameters, `wsrep_*` params, etc !!!
 
 ```shell
 sudo vi /etc/my.cnf.d/secrets-backup.cnf
@@ -47,10 +49,13 @@ sudo chown -R mysql /etc/my.cnf /etc/my.cnf.d /var/log/mysql /etc/mysql
 sudo ls -ld /etc/my.cnf /etc/my.cnf.d /var/log/mysql /etc/mysql
 ```
 
-Change my.cnf and secrets-backup.cnf params...
-Make a copy of [env.sh](../upgrade_supporting_material/env.sh) in `/tmp`
+Make a copy of template [env.sh](../upgrade_supporting_material/env.sh) in `/tmp`. Then make the changes to env variables in it.
 ```shell
-vi /tmp/env.sh
+vi /tmp/env.sh          # IMPORTANT: make the necessary changes here !!!
+```
+
+Change my.cnf and secrets-backup.cnf params...
+```shell
 source /tmp/env.sh
 #export CLUSTER_NAME="pxc57_80-cluster" # NOTE: even though we are installing PXC 5.7, we will be upgrading it to 8.0
 #export SERVER_ID=12000

@@ -20,13 +20,13 @@ Refer to description of the values in [file](./upgrade_supporting_material/suppo
 
 ### Step 1-1: Create replication user credentials on current Prod cluster (PXC 5.7 - CentOS 7)
 
-SSH to `ssh centos@$CURR_PROD_MASTER_HOST`. And copy the contents of the MODIFIED env.sh on your laptop to `/tmp/env.sh` 
-
-```shell
-vi /tmp.env.sh
-```
+SSH to `ssh centos@$CURR_PROD_MASTER_HOST`. And copy the contents of the MODIFIED env.sh from your laptop to `/tmp/env.sh` to this host.
 
 On **CURR_PROD_MASTER_HOST**:
+
+```shell
+vi /tmp.env.sh            # IMPORTANT: Copy the contents from the env.sh in your laptop to here
+```
 
 ```shell
 source /tmp/env.sh
@@ -64,17 +64,24 @@ exit
 #sudo chown $CURR_PROD_HOST_SHELL_USER:$CURR_PROD_HOST_SHELL_USER $BACKUP_FILE_COMPRESSED
 ```
 
+### Step 1-3: Get the secrets-backup.cnf file from the current Prod cluster (PXC 5.7 - CentOS 7)
+You will need the contents of this file later## Step 2 : Create Intermediate (PXC 5.7 on Rocky 8) Replica (single node PXC)
+
 ## Step 2 : Create Intermediate (PXC 5.7 on Rocky 8) Replica (single node PXC)
 
 On **INTERMEDIATE_HOST**:
 
 ### Step 2-1 : Create Intermediate (PXC 5.7 on Rocky 8) Replica manually
-[Setup this up manually](./5_7/pxc57_Rocky8.md).
+[Setup the software manually](./5_7/pxc57_Rocky8.md).
+
+#### Create env.sh
+```shell
+vi /tmp/env.sh    # IMPORTANT: Copy the contents of env.sh from you laptop to this host
+```
 
 ### Step 2-2 : Transfer binary backup from Prod host to this (intermediate) host
 
 ```shell
-vi /tmp/env.sh # Copy the contents of env.sh to this host
 source /tmp/env.sh
 ls -l $BACKUP_FILE_COMPRESSED
 ```
@@ -155,14 +162,21 @@ innobackupex --copy-back $BACKUP_RESTORE_STAGING_LOC
 exit
 ```
 
-##### Start the node
+#### Merge my.cnf
+**IMPORTANT**: Merge values from the current Prod clusters my.cnf with the my.cnf on this (Intermediate) host (PXC 5.7). Especially, InnoDB and WSREP params.
+
+Current Prod values can be obtained...
+```shell
+source /tmp/env.sh
+cat $BACKUP_RESTORE_STAGING_LOC/backup-my.cnf
+```
+
+#### Start the node
 
 ```shell
 sudo systemctl start mysql@bootstrap.service
 sudo systemctl status mysql@bootstrap.service
-sudo vi /var/log/mysql/mysqld.log
-# check for any ERROR s.
-#sudo systemctl status mysql
+sudo vi /var/log/mysql/mysqld.log             # check for any ERROR s.
 ```
 
 ### Step 2-4 : Setup replication from Prod to this (Intermediate) host
@@ -244,16 +258,28 @@ sudo yum install bind-utils -y # host
 host $CMON_HOST # if this returns host not found, it indicates you will beed to set skip_name_resolve=ON in the [mysqld] section and restart
 ```
 
-Copy [my.cnf](./8_0/my.cnf)
-**VERY IMPORTANT**: `skip_name_resolve` - Make sure the target DB host, in this case the INTERMEDIATE_HOST, can resolve the CCv2 host by name.
-If not, you must set `skip_name_resolve=ON` in the `[MYSQLD]` section. Use the `host` command as shown below to determine if DNS is setup in your network.
+#### Merge my.cnf
+**IMPORTANT**: Merge values from PXC 5.7 my.cnf with the my.cnf for PXC 8 on this (Intermediate) Especially, InnoDB and WSREP params.
+
+Copy the contents of template [my.cnf](./8_0/my.cnf)
+**IMPORTANT**: 
+1. `skip_name_resolve` - Make sure the target DB host, in this case the INTERMEDIATE_HOST, can resolve the CCv2 host by name. If not, you must set `skip_name_resolve=ON` in the `[MYSQLD]` section. Use the `host` command as shown below to determine if DNS is setup in your network.
+2. Merge values of my.cnf with what you may currently have, especially the `innodb`, `wsrep_*`, etc., parameters !!!
 
 ```shell
 sudo mv /etc/my.cnf ~
-sudo vi /etc/my.cnf
+sudo vi /etc/my.cnf     # Copy contents of template in git here.
 ```
 
-Copy [secrets-backup.cnf](./8_0/secrets-backup.cnf)
+Merge values from `~/my.cnf` with `/etc/my.cnf` 
+```shell
+sudo vi /etc/my.cnf     # Merget values.
+```
+
+#### Update secrets-backup.cnf
+**IMPORTANT**:
+1. Copy contents of template [secrets-backup.cnf](./8_0/secrets-backup.cnf).
+2. Replace the values with values from current Prod cluster. Respect commented out values in the template (PXC 8).
 
 ```shell
 sudo mv /etc/my.cnf.d/secrets-backup.cnf ~
@@ -337,7 +363,7 @@ mysql -u root -p$MYSQLROOTPW -e "select host,user from mysql.user where user lik
 ## Step 4 - Import PXC 8 on (Rocky 8) into CCv2
 
 ### Step 4-1 : Import PXC 8 into CCv2 using CCv2
-Use the MySQL `root` user's password from [env](./upgrade_supporting_material/env.sh) file. 
+Use the MySQL `root` user's password from `/tmp/env.sh` file. 
 
 ### Step 4-2 : Take backup (xtrabackupfull) from CCv2
 
@@ -457,9 +483,6 @@ sudo yum install bind-utils -y # host
 host $CMON_HOST # if this returns host not found, it indicates you will beed to set skip_name_resolve=ON in the [mysqld] section and restart
 ```
 
-**VERY IMPORTANT**: `skip_name_resolve` - Make sure the target DB host, in this case the INTERMEDIATE_HOST, can resolve the CCv2 host by name.
-If not, you must set `skip_name_resolve=ON` in the `[MYSQLD]` section in `/etc/my.cnf`. Use the `host` command as shown below to determine if DNS is setup in your network.
-
 ```shell
 sudo cp /etc/my.cnf ~
 sudo vi /etc/my.cnf
@@ -467,7 +490,7 @@ sudo vi /etc/my.cnf
 
 ##### Change the credentials in secrets-backup.cnf to match INTERMEDIATE's
 
-Copy contents of [secrets-backup.cnf](./8_0/secrets-backup.cnf)
+Update `backupuser` credentials in `secrets-backup.cnf` to match that of current Prod.
 
 ```shell
 sudo cp /etc/my.cnf.d/secrets-backup.cnf ~
