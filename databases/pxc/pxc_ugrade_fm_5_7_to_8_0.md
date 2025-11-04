@@ -483,6 +483,13 @@ sudo yum install bind-utils -y # host
 host $CMON_HOST # if this returns host not found, it indicates you will beed to set skip_name_resolve=ON in the [mysqld] section and restart
 ```
 
+Get the innodb values from the backed up cluster by...
+```shell
+source /tmp/env.sh
+cat $BACKUP_RESTORE_STAGING_LOC/backup-my.cnf
+```
+
+Update the values in `/etc/my.cnf` with values in `backup-my.cnf` file above.
 ```shell
 sudo cp /etc/my.cnf ~
 sudo vi /etc/my.cnf
